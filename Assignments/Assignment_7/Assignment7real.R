@@ -23,5 +23,5 @@ df %>%
   geom_point() + 
   facet_wrap(~County)
 # It seems that in Counties with a higher population, there are higher proportions of LDS and a lower proportion of non-religious people. 
-#     For example, in Utah County, there are is an extremely high proportion of LDS people with an extremely low proportion of non-religious people. 
+#     For example, in Utah County, a county with a high population, there are is an extremely high proportion of LDS people with an extremely low proportion of non-religious people. 
 #     In Grand County, a county with a low population, there are lower proportions of LDS, Catholic, and Orthodox people, but high non-religious people. 
