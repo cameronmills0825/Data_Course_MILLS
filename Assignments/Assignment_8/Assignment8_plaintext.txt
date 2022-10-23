@@ -1,0 +1,15 @@
+##########
+library(tidyverse)
+library(easystats)
+library(modelr)
+
+
+# 1. I would say that none of my predected response values from my best model are meaningful, just because initially, the MSE was high. But on the plot, the growth rate is affected by the nitrogen levels. As the nitrogen levels increased, the predicted growth rate significantly decreased. 
+# 2. My model 4 had a non-linear relationship. An article online that explains how to deal with modeling non-linear relationships in R is https://data-flair.training/blogs/r-nonlinear-regression/
+# 3. 
+df2 <- read_csv("C:/Users/email/Data_Course_MILLS/Assignments/Assignment_8/non_linear_relationship.csv")
+model_1 <- glm(data = df2, 
+               formula = response ~ predictor)
+add_predictions(df2, model_1) %>% 
+  ggplot(aes(x=predictor, y=pred)) + 
+  geom_point()
