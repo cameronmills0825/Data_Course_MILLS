@@ -1,0 +1,112 @@
+---
+title: "Assignment_9"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE
+)
+```
+
+We'll be looking at the "GradSchool_Admissions" data set.
+We first gotta set up and clean the data set:
+```{r}
+library(tidyverse)
+library(easystats)
+library(janitor)
+library(modelr)
+library(GGally)
+library(ggpubr)
+library(scales)
+library(rlang)
+install.packages("rlang")
+
+
+# Cleaning Data:
+df <- read_csv("C:/Users/email/Data_Course_MILLS/Assignments/Assignment_9/Data/GradSchool_Admissions.csv")
+df <- df %>% 
+  mutate(admit = case_when(admit == 1 ~ TRUE, 
+                           TRUE ~ FALSE))
+df$Student <- seq.int(nrow(df))
+df <- df[, c(5, 1, 2, 3, 4)]
+```
+
+Now here's a glimpse of the data: 
+```{r}
+glimpse(df)
+```
+
+```{r}
+df %>% 
+  select(admit, gpa, gre,rank) %>% 
+  ggpairs()
+```
+I want to focus on the GPA's among these students and see specifically what types of students have the best GPA's. 
+First, lets look at the distribution of GPAs among different ranks of undergraduate programs: 
+```{r}
+df %>% 
+  ggplot(aes(x=gpa)) + 
+  geom_density() + 
+  facet_wrap(~rank) + 
+  theme_minimal()
+```
+```{r}
+# Testing normality
+ggpubr::ggqqplot(df$gpa)
+```
+Based on this quick test, GPA looks like a good variable to test. 
+
+
+
+## Models
+```{r}
+names(df)
+```
+```{r}
+mod1 <- glm(data = df, formula = gpa ~ admit + gre)
+
+mod2 <- glm(data = df, formula = gpa ~ admit * gre)
+
+mod3 <- glm(data = df, formula = gpa ~ admit * gre * rank)
+```
+I'm going to compare the performance of each of these models against each other: 
+
+```{r}
+comps <- compare_performance(mod1, mod2, mod3, rank = TRUE)
+comps
+```
+```{r}
+comps %>% plot()
+```
+As you can see here, model 2 is superior compared to models 1 and 3. It is also a good model to test because of it's simplicity. 
+
+From these models, I am going to take a look at predictions:
+```{r}
+df %>% 
+  gather_predictions(mod1, mod2, mod3) %>% 
+  ggplot(aes(x=gpa, y=pred, color=model)) + 
+  geom_segment(aes(x=0, y=0, xend=4, yend=4), 
+               linetype = 2, color="black", alpha=0.5) + 
+  geom_smooth(method = "lm", se=TRUE) + 
+  facet_wrap(~model)
+  
+```
+We can see here that the predictions among all three models are extremely similar. So even though Model 2 performs better than the other models, its predictions for the future are the same as the other models... for some reason.  
+
+Obviously, a higher GPA will lead to a better chance at being admitted into a graduate program. 
+
+
+
+
+
+
+
+
+
+
+
+
+
