@@ -1,0 +1,90 @@
+---
+title: "MILLS_Skills_Test_3"
+author: "Cameron Mills"
+date: "11/21/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(modelr)
+library(janitor)
+library(broom)
+
+```
+
+Loading in data and cleaning it up: 
+```{r}
+df <- read_csv("C:/Users/email/Data_Course_MILLS/Exams/Exam 3/Data/FacultySalaries_1995.csv")
+clean_names(df)
+
+df <- 
+df %>% 
+  pivot_longer(cols = contains(c("FullProfSalary", "AssocProfSalary", "AssistProfSalary")), 
+               names_to = "Rank_Salary", 
+               values_to = "Salary")
+
+df <- 
+  df %>% pivot_longer(cols = contains(c("FullProfComp", "AssocProfComp", "AssistProfComp", "CompAll")), 
+                      names_to = "Rank_Comp", 
+                      values_to = "Comp")
+
+df <- 
+  df %>% pivot_longer(cols = contains(c("FullProfs", "AssocProfs", "AssistProfs")), 
+                      names_to = "Rank_Profs", 
+                      values_to = "Num_Profs")
+```
+
+Here is a box plot showing Salary as a function of Rank (Full, Assist, Assoc) based on their tier as well. The first box for each color is the I tier, the second box for each color is the IIA tier, and the third box for each color is the IIB  tier: 
+
+```{r}
+df %>% 
+  ggplot(aes(x=Rank_Salary, y=Salary, z=Tier, fill=Rank_Salary)) + 
+  geom_boxplot()
+
+```
+
+We will now build an ANOVA model. This model will test the influence of "State", "Tier", and "Rank" on Salary. 
+```{r}
+mod1 <- 
+  aov(data = df, formula = Salary ~ State + Tier + Rank_Salary)
+summary(mod1)
+```
+
+The rest of this report will focus on another data set:
+
+```{r}
+dat <- read_csv("C:/Users/email/Data_Course_MILLS/Exams/Exam 3/Data/Juniper_Oils.csv")
+
+dat <- dat %>% 
+  pivot_longer(cols = contains(c("ene", "ol", "al", "compound")), 
+               names_to = "Compound", 
+               values_to = "Conc")
+```
+
+Aaaand here's a graph
+
+```{r}
+dat %>% ggplot(aes(x=YearsSinceBurn, y=Conc)) + 
+  geom_line(linetype=0) +
+  geom_smooth() + 
+  facet_wrap(~Compound, scales = "free")
+```
+
+Here's a generalized linear model to show concentrations that are affected by "Years Since Burn": 
+
+```{r}
+mod2 <- glm(data = dat, 
+            formula = Conc ~ Compound * YearsSinceBurn * ChemMean * Tree_Species)
+tidy(mod2) %>% 
+  filter(p.value<0.05)
+
+```
+
+
+
+
