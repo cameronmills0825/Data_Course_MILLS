@@ -1,11 +1,11 @@
-# EXAM 1
+# EXAM 4 (A redo of exam 1!)
 
 library(stringr)
 library(data.table)
 library(tidyverse)
 
 # I. Read the cleaned_covid_data.csv file into an R data frame. (20 pts)
-covid_data <- read.csv("C:/Users/email/BIOL3100_Exams/Exam_1/cleaned_covid_data.csv")
+covid_data <- read_csv("./Data/cleaned_covid_data.csv")
 
 # II. Subset the data set to just show states that begin with “A” and save this as an object called A_states. (20 pts)
 A_States <- subset(covid_data, grepl('A', covid_data$Province_State))
